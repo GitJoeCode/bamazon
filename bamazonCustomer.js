@@ -37,37 +37,31 @@ var custBuy = function() {
     connection.query("SELECT * FROM products", function(err, results) {
         if (err) throw err;
 
-        inquirer.prompt([
-            {
-                type: "rawlist",
-                name: "choice",
-                message: "Enter the ID of product you want to purchase",
-                choices: function creatProductArray() {
-                    var productArray = [];
-                    for (var i = 0; i < results.length; i++) {
-                        productArray.push(results[i].product_name);
+        inquirer.prompt(
+            [
+                {
+                    type: "rawlist",
+                    name: "choice",
+                    message: "Enter the ID of product you want to purchase",
+                    choices: function creatProductArray() {
+                        var productArray = [];
+                        for (var i = 0; i < results.length; i++) {
+                            productArray.push(results[i].product_name);
+                        }
+                        return productArray;
                     }
-                    return productArray;
+                },
+                {
+                    type: "input",
+                    name: "quantity",
+                    message: "How many units desired?"
                 }
-            },
-            {
-                type: "input",
-                name: "quantity",
-                message: "How many units desired?"
-            }
-        ]).then(function(answer) {
-            var item;
-            for (var i = 0; i < results.length; i++) {
-                if (results[i].product_name === answer.product) {
-                    item = results[i];
-                }
-            }
-
-            if ()
-            }
-        })
-    })
-
+            ]
+        ).then(function(val) {
+            checkStock(val, results);
+        });
+    });
+};
 
 
 function checkStock(answer, results) {
@@ -82,7 +76,7 @@ function checkStock(answer, results) {
         };
     };
     if (stockQuantity >= parseInt(requestedQuantity)) {
-        changeStockQuantity();
+        changeStock();
         calculateTotal();
         connection.query (
             "UPDATE products SET ? WHERE ?",
@@ -125,7 +119,19 @@ function checkStock(answer, results) {
             }
         )
     } else {
-        console.log("Insufficient quantity, try again.");
+        console.log("Insufficient quantity!");
         loadProducts();
     };
+};
+
+function changeStock() {
+    newStockQuantity = stockQuantity - requestedQuantity;
+};
+
+function calculateTotal() {
+    customerTotal = cost * requestedQuantity;
+};
+
+function calculateProductSales() {
+    totalSales = salesToDate + customerTotal;
 };
